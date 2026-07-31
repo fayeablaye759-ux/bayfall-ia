@@ -10,6 +10,7 @@
 <meta property="og:site_name" content="Bay Fall IA">
 <meta property="og:title" content="Bay Fall IA — Diagnostic IA gratuit pour votre entreprise">
 <meta property="og:description" content="Répondez à quelques questions, recevez votre rapport de diagnostic IA personnalisé. Gratuit, simple, pensé pour les PME africaines.">
+<meta property="og:url" content="https://fayeablaye759-ux.github.io/bayfall-ia/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%230D1B2E'/%3E%3Ctext x='50' y='64' font-size='38' font-weight='bold' text-anchor='middle' fill='%23D4AF37' font-family='Georgia'%3EBF%3C/text%3E%3C/svg%3E">
 <style>
   :root {
@@ -271,6 +272,10 @@
   // Tant qu'il est vide, les boutons WhatsApp du rapport restent masqués.
   var WHATSAPP_BAYFALL = "221764528663";
 
+  // Boîte aux lettres des copies de rapport : chaque diagnostic complété est envoyé
+  // par email à Bay Fall IA via FormSubmit (service gratuit, sans serveur).
+  var COPIE_ENDPOINT = "https://formsubmit.co/ajax/fayeablaye759@gmail.com";
+
   /* ============ définition du questionnaire ============ */
   var SECTORS = ["Commerce / Boutique", "Services aux entreprises", "Restauration / Hôtellerie", "Immobilier", "Éducation / Formation", "Santé", "Transport / Logistique", "Artisanat / Production", "Finance / Microfinance", "Agriculture / Agroalimentaire", "Technologie / Digital", "Autre"];
   var SIZES = ["Je travaille seul(e)", "2 à 10 personnes", "11 à 50 personnes", "51 à 200 personnes", "Plus de 200 personnes"];
@@ -280,8 +285,9 @@
       id: "infos", title: "Faisons connaissance", help: "Quelques informations générales sur votre entreprise.",
       fields: [
         { k: "entreprise", t: "text", label: "Nom de l'entreprise", req: true, ph: "Ex : Ndiaye Distribution" },
-        { k: "secteur", t: "select", label: "Secteur d'activité", req: true, opts: SECTORS },
+        { k: "secteur", t: "select", label: "Secteur d'activité", req: true, opts: SECTORS, other: "Autre" },
         { k: "taille", t: "select", label: "Taille de l'entreprise", req: true, opts: SIZES },
+        { k: "taille_exacte", t: "tel", label: "Nombre exact d'employés <span class='opt-note'>(si vous le connaissez, facultatif)</span>", ph: "Ex : 12" },
         { k: "responsable", t: "text", label: "Votre nom <span class='opt-note'>(responsable)</span>", ph: "Prénom et nom" },
         { k: "contact", t: "tel", label: "Votre numéro WhatsApp <span class='opt-note'>(pour recevoir le suivi, facultatif)</span>", ph: "+221 ..." }
       ]
@@ -484,9 +490,16 @@
       } else if (f.t === "textarea") {
         h += "<div class='field'><label>" + f.label + "</label><textarea id='f-" + f.k + "' placeholder='" + (f.ph || "") + "'>" + esc(v || "") + "</textarea></div>";
       } else if (f.t === "select") {
+        var isOther = f.other && v && f.opts.indexOf(v) < 0;
         h += "<div class='field'><label>" + f.label + "</label><select id='f-" + f.k + "'><option value=''>— Choisir —</option>";
-        f.opts.forEach(function (o) { h += "<option" + (v === o ? " selected" : "") + ">" + o + "</option>"; });
-        h += "</select></div>";
+        f.opts.forEach(function (o) { h += "<option" + ((v === o || (isOther && o === f.other)) ? " selected" : "") + ">" + o + "</option>"; });
+        h += "</select>";
+        if (f.other) {
+          h += "<div id='f-" + f.k + "-autre-box' class='" + (isOther ? "" : "hidden") + "' style='margin-top:9px;'>"
+            + "<input type='text' id='f-" + f.k + "-autre' placeholder='Écrivez votre secteur d&#39;activité...' value='" + esc(isOther ? v : "") + "'>"
+            + "</div>";
+        }
+        h += "</div>";
       } else if (f.t === "multi" || f.t === "radio") {
         var type = f.t === "multi" ? "checkbox" : "radio";
         h += "<div class='choices' data-k='" + f.k + "'>";
@@ -498,6 +511,16 @@
       }
     });
     stepBox.innerHTML = h;
+    s.fields.forEach(function (f) {
+      if (f.t === "select" && f.other) {
+        var sel = document.getElementById("f-" + f.k);
+        sel.addEventListener("change", function () {
+          var box = document.getElementById("f-" + f.k + "-autre-box");
+          box.classList.toggle("hidden", sel.value !== f.other);
+          if (sel.value === f.other) document.getElementById("f-" + f.k + "-autre").focus();
+        });
+      }
+    });
     stepBox.querySelectorAll(".choice input").forEach(function (inp) {
       inp.addEventListener("change", function () {
         var group = inp.closest(".choices");
@@ -526,6 +549,11 @@
       } else {
         var el = document.getElementById("f-" + f.k);
         answers[f.k] = (el.value || "").trim();
+        if (f.t === "select" && f.other && answers[f.k] === f.other) {
+          var custom = (document.getElementById("f-" + f.k + "-autre").value || "").trim();
+          if (custom) answers[f.k] = custom;
+          else if (f.req) missing = true;
+        }
         if (f.req && !answers[f.k]) missing = true;
       }
     });
@@ -577,19 +605,47 @@
     return { crit: crit, imp: imp, opt: opt };
   }
 
+  // Envoie une copie du diagnostic vers la boîte aux lettres Bay Fall IA (Sheet + email).
+  // Envoi silencieux : si internet coupe ou si l'adresse est vide, le client n'est jamais bloqué.
+  function envoyerCopie(top, mat) {
+    if (!COPIE_ENDPOINT) return;
+    var d = {
+      _subject: "Nouveau diagnostic Bay Fall IA : " + answers.entreprise,
+      _template: "table",
+      entreprise: answers.entreprise, secteur: answers.secteur,
+      taille: (answers.taille_exacte ? answers.taille_exacte + " employés" : answers.taille),
+      responsable: answers.responsable || "", contact: answers.contact || "",
+      description: answers.description || "", produits: answers.produits || "",
+      objectifs: (answers.objectifs || []).map(function (o) { return OBJ_LABELS[o]; }).join(" | "),
+      problemes: (answers.problemes || []).map(function (p) { return PROB_LABELS[p]; }).join(" | "),
+      taches: (answers.taches || []).join(" | "),
+      maturite: (MATURITY[answers.maturite] || {}).niveau || "",
+      budget: BUDGET_LABELS[answers.budget] || "",
+      contraintes: (answers.contraintes || []).join(" | "),
+      succes: answers.succes || "",
+      reco1: top[0] ? top[0].c.titre : "", reco2: top[1] ? top[1].c.titre : "", reco3: top[2] ? top[2].c.titre : ""
+    };
+    try {
+      fetch(COPIE_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(d) });
+    } catch (e) { /* jamais bloquant pour le client */ }
+  }
+
   function buildReport() {
     var opps = scoreOpportunities();
     var probs = classifyProblems();
     var mat = MATURITY[answers.maturite] || MATURITY.basique;
     var top = opps.slice(0, 3);
+    envoyerCopie(top, mat);
     var today = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 
     var objList = (answers.objectifs || []).map(function (o) { return OBJ_LABELS[o].toLowerCase(); }).join(", ");
+    var nbExact = (answers.taille_exacte || "").replace(/[^0-9]/g, "");
+    var tailleTxt = nbExact ? nbExact + " employé" + (parseInt(nbExact, 10) > 1 ? "s" : "") : answers.taille;
 
     var h = "<div class='r-head'>"
       + "<div class='r-brand'>Bay Fall IA &bull; Rapport de diagnostic</div>"
       + "<h2>" + esc(answers.entreprise) + "</h2>"
-      + "<p>" + esc(answers.secteur) + " &bull; " + esc(answers.taille) + " &bull; " + today + "</p>"
+      + "<p>" + esc(answers.secteur) + " &bull; " + esc(tailleTxt) + " &bull; " + today + "</p>"
       + "</div><div class='r-body'>";
 
     // 1. Résumé exécutif
