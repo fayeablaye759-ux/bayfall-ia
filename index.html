@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bay Fall IA — Diagnostic IA gratuit pour votre entreprise</title>
+<meta name="description" content="Découvrez en 10 minutes où l'intelligence artificielle peut faire gagner du temps et de l'argent à votre entreprise. Diagnostic gratuit, pensé pour l'Afrique francophone.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_SN">
+<meta property="og:site_name" content="Bay Fall IA">
+<meta property="og:title" content="Bay Fall IA — Diagnostic IA gratuit pour votre entreprise">
+<meta property="og:description" content="Répondez à quelques questions, recevez votre rapport de diagnostic IA personnalisé. Gratuit, simple, pensé pour les PME africaines.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%230D1B2E'/%3E%3Ctext x='50' y='64' font-size='38' font-weight='bold' text-anchor='middle' fill='%23D4AF37' font-family='Georgia'%3EBF%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --navy: #0D1B2E;
+    --navy-2: #14263F;
+    --navy-3: #1C3354;
+    --gold: #C9A227;
+    --gold-soft: #D4AF37;
+    --gold-pale: #F4E9C9;
+    --paper: #F7F5F0;
+    --card: #FFFFFF;
+    --ink: #1A2333;
+    --ink-soft: #1A233399;
+    --line: #1A233322;
+    --ok: #1B6B4A;
+    --warn: #A8552F;
+    --crit: #9C2B2B;
+    --shadow: 0 1px 2px rgba(13,27,46,.06), 0 10px 30px -12px rgba(13,27,46,.22);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 18px; }
+
+  /* ---------- entête ---------- */
+  header.site {
+    background: var(--navy);
+    color: #F2EFE7;
+    padding: 14px 0;
+  }
+  header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--navy-3), var(--navy));
+    border: 2px solid var(--gold-soft);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold-soft); font-weight: 800; font-family: Georgia, serif; font-size: .95rem;
+    letter-spacing: .5px;
+  }
+  .brand-name { font-weight: 700; letter-spacing: .4px; }
+  .brand-name b { color: var(--gold-soft); font-weight: 800; }
+  .brand-sub { font-size: .72rem; color: #F2EFE799; letter-spacing: .6px; text-transform: uppercase; }
+
+  /* ---------- héros ---------- */
+  .hero {
+    background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 60%, var(--navy-3) 100%);
+    color: #F2EFE7;
+    padding: 52px 0 58px;
+  }
+  .eyebrow {
+    display: inline-block; font-size: .74rem; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--gold-soft); border: 1px solid #D4AF3755; border-radius: 999px;
+    padding: 5px 12px; margin: 0 0 16px;
+  }
+  .hero h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.7rem, 4.6vw, 2.6rem);
+    line-height: 1.18; margin: 0 0 14px; font-weight: 700;
+  }
+  .hero h1 .accent { color: var(--gold-soft); }
+  .hero p.lead { max-width: 560px; color: #F2EFE7cc; margin: 0 0 24px; font-size: 1.02rem; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    border: none; cursor: pointer; text-decoration: none;
+    font-weight: 700; font-size: .98rem; border-radius: 12px;
+    padding: 13px 22px; transition: transform .08s ease, box-shadow .2s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-gold { background: var(--gold-soft); color: var(--navy); box-shadow: 0 8px 24px -10px #D4AF3799; }
+  .btn-gold:hover { background: #E2C155; }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+  .btn-navy { background: var(--navy); color: #F2EFE7; }
+  .btn-wa { background: #1B6B4A; color: #F3F6EF; }
+  .trust { display: flex; flex-wrap: wrap; gap: 14px 22px; margin-top: 26px; font-size: .86rem; color: #F2EFE7b3; }
+  .trust span { display: flex; align-items: center; gap: 7px; }
+  .trust svg { width: 15px; height: 15px; stroke: var(--gold-soft); }
+
+  /* ---------- méthode ---------- */
+  .method { padding: 42px 0 10px; }
+  .method h2, .steps-title {
+    font-family: Georgia, serif; font-size: clamp(1.25rem, 3vw, 1.6rem); margin: 0 0 6px;
+  }
+  .method p.note { color: var(--ink-soft); margin: 0 0 22px; max-width: 640px; }
+  .method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  .m-card {
+    background: var(--card); border-radius: 14px; padding: 18px; box-shadow: var(--shadow);
+    border-top: 3px solid var(--gold-soft);
+  }
+  .m-card .num { font-family: Georgia, serif; color: var(--gold); font-size: 1.15rem; font-weight: 700; }
+  .m-card h3 { margin: 6px 0 6px; font-size: 1rem; }
+  .m-card p { margin: 0; font-size: .87rem; color: var(--ink-soft); }
+
+  /* ---------- questionnaire ---------- */
+  .quiz { padding: 40px 0 70px; }
+  .panel {
+    background: var(--card); border-radius: 18px; box-shadow: var(--shadow);
+    padding: 26px 24px 24px; max-width: 720px; margin: 0 auto;
+  }
+  .progress { height: 7px; background: #1A233314; border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+  .progress > div { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); width: 0%; transition: width .3s ease; }
+  .step-label { font-size: .78rem; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 14px; }
+  .q-title { font-family: Georgia, serif; font-size: 1.25rem; margin: 0 0 4px; }
+  .q-help { color: var(--ink-soft); font-size: .9rem; margin: 0 0 18px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-weight: 600; font-size: .92rem; margin-bottom: 6px; }
+  .field .opt-note { font-weight: 400; color: var(--ink-soft); }
+  input[type=text], input[type=tel], select, textarea {
+    width: 100%; padding: 12px 13px; border: 1.5px solid var(--line); border-radius: 11px;
+    font: inherit; background: #FBFAF7; color: var(--ink);
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--gold-soft); border-color: transparent; }
+  textarea { min-height: 88px; resize: vertical; }
+  .choices { display: flex; flex-direction: column; gap: 9px; }
+  .choice {
+    display: flex; align-items: flex-start; gap: 11px;
+    border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 13px;
+    cursor: pointer; background: #FBFAF7; transition: border-color .12s, background .12s;
+    font-size: .94rem;
+  }
+  .choice:hover { border-color: var(--gold-soft); }
+  .choice.on { border-color: var(--gold); background: var(--gold-pale); }
+  .choice input { margin-top: 3px; accent-color: var(--gold); }
+  .nav-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; }
+  .err { color: var(--crit); font-size: .86rem; margin-top: 10px; display: none; }
+
+  /* ---------- rapport ---------- */
+  .report { max-width: 780px; margin: 0 auto; padding: 34px 0 80px; }
+  .r-head {
+    background: var(--navy); color: #F2EFE7; border-radius: 18px 18px 0 0;
+    padding: 26px 26px 22px;
+  }
+  .r-head .r-brand { color: var(--gold-soft); font-size: .8rem; letter-spacing: 1.6px; text-transform: uppercase; margin-bottom: 8px; }
+  .r-head h2 { font-family: Georgia, serif; margin: 0 0 4px; font-size: 1.5rem; }
+  .r-head p { margin: 0; color: #F2EFE7b3; font-size: .9rem; }
+  .r-body { background: var(--card); border-radius: 0 0 18px 18px; box-shadow: var(--shadow); padding: 10px 26px 28px; }
+  .r-sec { padding: 20px 0 6px; border-bottom: 1px solid #1A233312; }
+  .r-sec:last-child { border-bottom: none; }
+  .r-sec h3 { font-family: Georgia, serif; font-size: 1.08rem; margin: 0 0 10px; display: flex; gap: 10px; align-items: baseline; }
+  .r-sec h3 .n { color: var(--gold); font-size: .9rem; }
+  .r-sec p, .r-sec li { font-size: .93rem; }
+  .r-sec ul { margin: 6px 0 12px; padding-left: 20px; }
+  .tag { display: inline-block; border-radius: 999px; padding: 3px 11px; font-size: .74rem; font-weight: 700; letter-spacing: .3px; }
+  .tag.crit { background: #9C2B2B18; color: var(--crit); }
+  .tag.warn { background: #A8552F1a; color: var(--warn); }
+  .tag.ok { background: #1B6B4A16; color: var(--ok); }
+  .tag.gold { background: var(--gold-pale); color: #7A6212; }
+  .opp {
+    border: 1.5px solid #1A233315; border-left: 4px solid var(--gold-soft);
+    border-radius: 12px; padding: 14px 15px; margin: 0 0 12px; background: #FBFAF7;
+  }
+  .opp h4 { margin: 0 0 5px; font-size: .99rem; }
+  .opp p { margin: 4px 0; color: var(--ink); }
+  .opp .why { color: var(--ink-soft); font-size: .86rem; }
+  .maturity {
+    display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 8px;
+  }
+  .mat-step {
+    flex: 1; min-width: 120px; text-align: center; padding: 10px 8px; border-radius: 10px;
+    background: #1A23330d; color: var(--ink-soft); font-size: .82rem; font-weight: 600;
+  }
+  .mat-step.here { background: var(--navy); color: var(--gold-soft); }
+  .plan-block { margin-bottom: 12px; }
+  .plan-block b { display: block; margin-bottom: 3px; }
+  .r-cta {
+    margin-top: 26px; background: var(--gold-pale); border-radius: 14px; padding: 20px;
+    text-align: center;
+  }
+  .r-cta p { margin: 0 0 14px; font-weight: 600; }
+  .r-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  footer {
+    background: var(--navy); color: #F2EFE799; text-align: center;
+    padding: 26px 18px; font-size: .85rem;
+  }
+  footer b { color: var(--gold-soft); }
+  .hidden { display: none !important; }
+
+  @media print {
+    header.site, .hero, .method, .quiz, footer, .r-cta, .no-print { display: none !important; }
+    body { background: #fff; }
+    .report { padding: 0; max-width: none; }
+    .r-body { box-shadow: none; }
+    .r-head { border-radius: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <div class="brand">
+      <span class="brand-mark">BF</span>
+      <span>
+        <span class="brand-name">BAY FALL <b>IA</b></span><br>
+        <span class="brand-sub">Diagnostic &amp; transformation IA</span>
+      </span>
+    </div>
+    <a class="btn btn-gold btn-sm no-print" href="#diagnostic" style="padding:10px 16px; font-size:.88rem;">Diagnostic gratuit</a>
+  </div>
+</header>
+
+<section class="hero" id="accueil">
+  <div class="wrap">
+    <span class="eyebrow">Gratuit &bull; 10 minutes &bull; Afrique francophone</span>
+    <h1>Découvrez où l'IA peut faire <span class="accent">gagner du temps et de l'argent</span> à votre entreprise.</h1>
+    <p class="lead">Répondez à quelques questions simples sur votre activité. Bay Fall IA analyse vos réponses avec sa méthode de diagnostic et vous remet un rapport personnalisé : vos problèmes classés par priorité, les opportunités IA adaptées à votre réalité, et un plan d'action concret.</p>
+    <a class="btn btn-gold" href="#diagnostic">Commencer mon diagnostic gratuit</a>
+    <div class="trust">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Sans engagement</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Budgets en FCFA</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Rapport immédiat</span>
+    </div>
+  </div>
+</section>
+
+<section class="method">
+  <div class="wrap">
+    <h2>Le diagnostic avant la solution</h2>
+    <p class="note">Un bon médecin ne prescrit pas de médicament sans avoir examiné son patient. Bay Fall IA applique la même règle à votre entreprise : comprendre d'abord, recommander ensuite.</p>
+    <div class="method-grid">
+      <div class="m-card"><span class="num">01</span><h3>Diagnostic</h3><p>Vous décrivez votre activité, vos difficultés et vos objectifs.</p></div>
+      <div class="m-card"><span class="num">02</span><h3>Analyse</h3><p>Vos réponses sont croisées avec la méthode Bay Fall IA.</p></div>
+      <div class="m-card"><span class="num">03</span><h3>Priorisation</h3><p>Chaque opportunité est évaluée : impact, faisabilité, coût.</p></div>
+      <div class="m-card"><span class="num">04</span><h3>Plan d'action</h3><p>Vous recevez un rapport clair avec les prochaines étapes.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="quiz" id="diagnostic">
+  <div class="panel" id="quiz-panel">
+    <div class="progress"><div id="prog-bar"></div></div>
+    <div class="step-label" id="step-label"></div>
+    <div id="step-box"></div>
+    <p class="err" id="err-msg">Merci de remplir ce champ avant de continuer.</p>
+    <div class="nav-row">
+      <button type="button" class="btn btn-ghost" id="btn-prev">Retour</button>
+      <button type="button" class="btn btn-navy" id="btn-next">Continuer</button>
+    </div>
+  </div>
+</section>
+
+<section class="report hidden" id="report"></section>
+
+<footer>
+  <b>BAY FALL IA</b> — Diagnostic et transformation IA des entreprises africaines<br>
+  Comprendre avant de proposer. &copy; 2026 Bay Fall IA
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // Numéro WhatsApp de Bay Fall IA (format international sans +, ex: 221771234567).
+  // Tant qu'il est vide, les boutons WhatsApp du rapport restent masqués.
+  var WHATSAPP_BAYFALL = "221764528663";
+
+  /* ============ définition du questionnaire ============ */
+  var SECTORS = ["Commerce / Boutique", "Services aux entreprises", "Restauration / Hôtellerie", "Immobilier", "Éducation / Formation", "Santé", "Transport / Logistique", "Artisanat / Production", "Finance / Microfinance", "Agriculture / Agroalimentaire", "Technologie / Digital", "Autre"];
+  var SIZES = ["Je travaille seul(e)", "2 à 10 personnes", "11 à 50 personnes", "51 à 200 personnes", "Plus de 200 personnes"];
+
+  var steps = [
+    {
+      id: "infos", title: "Faisons connaissance", help: "Quelques informations générales sur votre entreprise.",
+      fields: [
+        { k: "entreprise", t: "text", label: "Nom de l'entreprise", req: true, ph: "Ex : Ndiaye Distribution" },
+        { k: "secteur", t: "select", label: "Secteur d'activité", req: true, opts: SECTORS },
+        { k: "taille", t: "select", label: "Taille de l'entreprise", req: true, opts: SIZES },
+        { k: "responsable", t: "text", label: "Votre nom <span class='opt-note'>(responsable)</span>", ph: "Prénom et nom" },
+        { k: "contact", t: "tel", label: "Votre numéro WhatsApp <span class='opt-note'>(pour recevoir le suivi, facultatif)</span>", ph: "+221 ..." }
+      ]
+    },
+    {
+      id: "activite", title: "Votre activité", help: "Expliquez simplement, comme à un ami.",
+      fields: [
+        { k: "description", t: "textarea", label: "Décrivez votre activité principale", req: true, ph: "Ex : Nous vendons du matériel de bureau aux entreprises de Dakar, avec livraison." },
+        { k: "produits", t: "textarea", label: "Vos principaux produits ou services", ph: "Ex : fournitures, mobilier, imprimantes, contrats d'entretien..." }
+      ]
+    },
+    {
+      id: "objectifs", title: "Vos objectifs", help: "Que voulez-vous améliorer en priorité ? (plusieurs choix possibles)",
+      fields: [
+        { k: "objectifs", t: "multi", req: true, opts: [
+          ["temps", "Gagner du temps au quotidien"],
+          ["couts", "Réduire mes coûts"],
+          ["client", "Améliorer mon service client"],
+          ["ventes", "Augmenter mes ventes"],
+          ["orga", "Mieux organiser l'entreprise"],
+          ["former", "Former mon équipe à l'IA"]
+        ]}
+      ]
+    },
+    {
+      id: "problemes", title: "Vos difficultés actuelles", help: "Cochez tout ce qui vous concerne. Soyez honnête : c'est la base du diagnostic.",
+      fields: [
+        { k: "problemes", t: "multi", req: true, opts: [
+          ["manque-temps", "Manque de temps, journées surchargées"],
+          ["taches-manuelles", "Trop de tâches manuelles et répétitives"],
+          ["gestion-clients", "Difficulté à suivre et gérer les clients"],
+          ["service-deborde", "Service client débordé (messages sans réponse)"],
+          ["suivi-commercial", "Suivi commercial difficile (prospects perdus)"],
+          ["desorganisation", "Manque d'organisation interne"],
+          ["donnees-eparpillees", "Informations éparpillées (cahiers, WhatsApp, Excel...)"],
+          ["marketing-irregulier", "Communication / réseaux sociaux irréguliers"]
+        ]}
+      ]
+    },
+    {
+      id: "taches", title: "Vos tâches chronophages", help: "Quelles tâches prennent le plus de temps chez vous ? (plusieurs choix possibles)",
+      fields: [
+        { k: "taches", t: "multi", req: true, opts: [
+          ["messages", "Répondre aux messages et appels des clients"],
+          ["devis", "Préparer des devis et des factures"],
+          ["saisie", "Saisir et recopier des données"],
+          ["rapports", "Préparer des rapports ou des comptes rendus"],
+          ["prospection", "Chercher et relancer des prospects"],
+          ["reseaux", "Publier sur les réseaux sociaux"],
+          ["rdv", "Planifier les rendez-vous"],
+          ["stocks", "Gérer les stocks et les commandes"]
+        ]}
+      ]
+    },
+    {
+      id: "maturite", title: "Vos outils actuels", help: "Comment travaillez-vous aujourd'hui ?",
+      fields: [
+        { k: "maturite", t: "radio", req: true, opts: [
+          ["papier", "Surtout papier, cahiers et téléphone"],
+          ["basique", "WhatsApp, Excel et quelques outils simples"],
+          ["logiciels", "Des logiciels de gestion (caisse, comptabilité, CRM...)"],
+          ["automatise", "Des automatisations tournent déjà (n8n, Make, Zapier...)"]
+        ]}
+      ]
+    },
+    {
+      id: "budget", title: "Votre budget", help: "Quel investissement envisagez-vous pour ce projet IA ?",
+      fields: [
+        { k: "budget", t: "radio", req: true, opts: [
+          ["b1", "Moins de 300 000 FCFA"],
+          ["b2", "300 000 à 1 000 000 FCFA"],
+          ["b3", "1 à 3 millions FCFA"],
+          ["b4", "Plus de 3 millions FCFA"],
+          ["b0", "Je souhaite d'abord être conseillé"]
+        ]}
+      ]
+    },
+    {
+      id: "contraintes", title: "Vos contraintes", help: "Y a-t-il des limites à prendre en compte ? (facultatif)",
+      fields: [
+        { k: "contraintes", t: "multi", opts: [
+          ["budget-limite", "Budget serré"],
+          ["delai", "Besoin de résultats rapides"],
+          ["competences", "Pas de compétences techniques en interne"],
+          ["connexion", "Connexion internet parfois limitée"]
+        ]},
+        { k: "succes", t: "textarea", label: "Comment saurez-vous que le projet est une réussite ?", ph: "Ex : je réponds à tous mes clients en moins d'une heure, je gagne 2 heures par jour..." }
+      ]
+    }
+  ];
+
+  /* ============ moteur de recommandation ============ */
+  // Catalogue Bay Fall IA : chaque opportunité est déclenchée par des réponses précises.
+  var CATALOG = [
+    {
+      id: "assistant-wa", famille: "Agent IA", titre: "Assistant client WhatsApp",
+      desc: "Un assistant intelligent qui répond aux questions courantes de vos clients sur WhatsApp, 24h/24, et transmet les cas compliqués à votre équipe.",
+      benefice: "Plus aucun message sans réponse, clients servis même le soir et le week-end.",
+      triggers: { problemes: ["service-deborde", "gestion-clients"], taches: ["messages"], objectifs: ["client"] }
+    },
+    {
+      id: "quali-prospects", famille: "Agent IA", titre: "Qualification automatique des prospects",
+      desc: "Un agent qui pose les bonnes questions aux nouveaux contacts, identifie les plus sérieux et vous les transmet prêts à acheter.",
+      benefice: "Moins de temps perdu avec les curieux, plus de temps avec les vrais acheteurs.",
+      triggers: { problemes: ["suivi-commercial"], taches: ["prospection"], objectifs: ["ventes"] }
+    },
+    {
+      id: "auto-devis", famille: "Automatisation", titre: "Devis et factures automatisés",
+      desc: "Vos devis et factures générés en quelques secondes à partir d'un modèle, envoyés au client et archivés automatiquement.",
+      benefice: "Des heures gagnées chaque semaine et des documents professionnels sans erreur.",
+      triggers: { taches: ["devis"], objectifs: ["temps"] }
+    },
+    {
+      id: "auto-donnees", famille: "Automatisation", titre: "Fin de la saisie manuelle",
+      desc: "Les informations circulent seules entre vos outils (formulaires, tableaux, WhatsApp) : plus besoin de recopier.",
+      benefice: "Moins d'erreurs de saisie et du temps libéré pour les tâches à valeur.",
+      triggers: { taches: ["saisie"], problemes: ["taches-manuelles", "donnees-eparpillees"] }
+    },
+    {
+      id: "auto-rapports", famille: "Automatisation", titre: "Rapports générés automatiquement",
+      desc: "Vos comptes rendus et rapports d'activité produits automatiquement à partir de vos données, à la fréquence de votre choix.",
+      benefice: "Un pilotage clair de l'activité sans y passer vos soirées.",
+      triggers: { taches: ["rapports"], objectifs: ["orga"] }
+    },
+    {
+      id: "chatbot-faq", famille: "Chatbot IA", titre: "FAQ intelligente pour vos clients",
+      desc: "Un chatbot qui oriente les visiteurs, répond aux questions fréquentes (horaires, prix, disponibilité) et libère votre équipe.",
+      benefice: "Un accueil disponible en permanence, une équipe concentrée sur les vraies demandes.",
+      triggers: { problemes: ["service-deborde"], objectifs: ["client"] }
+    },
+    {
+      id: "social-ia", famille: "Automatisation", titre: "Communication régulière assistée par IA",
+      desc: "Un calendrier de publications préparé avec l'IA : idées, textes et visuels prêts à valider, publiés à heure fixe.",
+      benefice: "Une présence en ligne constante qui attire des clients, sans y penser chaque jour.",
+      triggers: { taches: ["reseaux"], problemes: ["marketing-irregulier"], objectifs: ["ventes"] }
+    },
+    {
+      id: "prise-rdv", famille: "Agent IA", titre: "Prise de rendez-vous automatique",
+      desc: "Vos clients réservent eux-mêmes leur créneau ; les rappels partent automatiquement pour éviter les absences.",
+      benefice: "Fini les allers-retours de messages pour caler une heure.",
+      triggers: { taches: ["rdv"] }
+    },
+    {
+      id: "orga-donnees", famille: "Conseil stratégique", titre: "Centralisation de vos informations",
+      desc: "Mise en place d'une source unique (clients, ventes, stocks) pour que l'IA puisse ensuite travailler sur des données fiables.",
+      benefice: "La fondation indispensable : une entreprise organisée, prête pour l'automatisation.",
+      triggers: { problemes: ["donnees-eparpillees", "desorganisation"], taches: ["stocks"], objectifs: ["orga"] }
+    },
+    {
+      id: "formation", famille: "Formation IA", titre: "Formation de votre équipe à l'IA",
+      desc: "Vos collaborateurs apprennent à utiliser les assistants IA au quotidien : rédaction, recherche, bonnes pratiques, prompts efficaces.",
+      benefice: "Chaque employé gagne du temps chaque jour, et l'entreprise devient autonome.",
+      triggers: { objectifs: ["former"], contraintes: ["competences"] }
+    },
+    {
+      id: "conseil", famille: "Conseil stratégique", titre: "Accompagnement stratégique IA",
+      desc: "Un accompagnement du dirigeant pour définir la feuille de route IA, choisir les bons outils et éviter les investissements inutiles.",
+      benefice: "Une vision claire et des choix sûrs, au lieu d'essais coûteux dans tous les sens.",
+      triggers: { budget: ["b0"] }
+    }
+  ];
+
+  var PROB_LABELS = {};
+  steps[3].fields[0].opts.forEach(function (o) { PROB_LABELS[o[0]] = o[1]; });
+  var OBJ_LABELS = {};
+  steps[2].fields[0].opts.forEach(function (o) { OBJ_LABELS[o[0]] = o[1]; });
+  var BUDGET_LABELS = {};
+  steps[6].fields[0].opts.forEach(function (o) { BUDGET_LABELS[o[0]] = o[1]; });
+
+  var MATURITY = {
+    papier:     { niveau: "Découverte", pas: 0, txt: "Vous travaillez surtout à la main. C'est le bon moment pour poser des bases simples : la marge de progression est énorme." },
+    basique:    { niveau: "Discuter", pas: 1, txt: "Vous utilisez déjà des outils simples. Prochain palier : connecter ces outils entre eux pour que l'information circule seule." },
+    logiciels:  { niveau: "Connecter", pas: 2, txt: "Vos outils sont en place. Prochain palier : les faire travailler ensemble et confier des décisions simples à l'IA." },
+    automatise: { niveau: "Déléguer", pas: 3, txt: "Des automatisations tournent déjà. Prochain palier : des agents IA qui tiennent une tâche de bout en bout, avec des résultats mesurés." }
+  };
+
+  /* ============ état et rendu du questionnaire ============ */
+  var answers = {};
+  var cur = 0;
+  var panel = document.getElementById("quiz-panel");
+  var stepBox = document.getElementById("step-box");
+  var progBar = document.getElementById("prog-bar");
+  var stepLabel = document.getElementById("step-label");
+  var errMsg = document.getElementById("err-msg");
+  var btnPrev = document.getElementById("btn-prev");
+  var btnNext = document.getElementById("btn-next");
+
+  function esc(s) { var d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
+
+  function renderStep() {
+    var s = steps[cur];
+    progBar.style.width = Math.round((cur) / steps.length * 100) + "%";
+    stepLabel.textContent = "Étape " + (cur + 1) + " sur " + steps.length;
+    errMsg.style.display = "none";
+    var h = "<h3 class='q-title'>" + s.title + "</h3><p class='q-help'>" + s.help + "</p>";
+    s.fields.forEach(function (f) {
+      var v = answers[f.k];
+      if (f.t === "text" || f.t === "tel") {
+        h += "<div class='field'><label>" + f.label + "</label><input type='" + f.t + "' id='f-" + f.k + "' placeholder='" + (f.ph || "") + "' value='" + esc(v || "") + "'></div>";
+      } else if (f.t === "textarea") {
+        h += "<div class='field'><label>" + f.label + "</label><textarea id='f-" + f.k + "' placeholder='" + (f.ph || "") + "'>" + esc(v || "") + "</textarea></div>";
+      } else if (f.t === "select") {
+        h += "<div class='field'><label>" + f.label + "</label><select id='f-" + f.k + "'><option value=''>— Choisir —</option>";
+        f.opts.forEach(function (o) { h += "<option" + (v === o ? " selected" : "") + ">" + o + "</option>"; });
+        h += "</select></div>";
+      } else if (f.t === "multi" || f.t === "radio") {
+        var type = f.t === "multi" ? "checkbox" : "radio";
+        h += "<div class='choices' data-k='" + f.k + "'>";
+        f.opts.forEach(function (o) {
+          var checked = f.t === "multi" ? (v || []).indexOf(o[0]) >= 0 : v === o[0];
+          h += "<label class='choice" + (checked ? " on" : "") + "'><input type='" + type + "' name='g-" + f.k + "' value='" + o[0] + "'" + (checked ? " checked" : "") + "> <span>" + o[1] + "</span></label>";
+        });
+        h += "</div>";
+      }
+    });
+    stepBox.innerHTML = h;
+    stepBox.querySelectorAll(".choice input").forEach(function (inp) {
+      inp.addEventListener("change", function () {
+        var group = inp.closest(".choices");
+        if (inp.type === "radio") group.querySelectorAll(".choice").forEach(function (c) { c.classList.remove("on"); });
+        inp.closest(".choice").classList.toggle("on", inp.checked);
+      });
+    });
+    btnPrev.style.visibility = cur === 0 ? "hidden" : "visible";
+    btnNext.textContent = cur === steps.length - 1 ? "Voir mon rapport" : "Continuer";
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function collect() {
+    var s = steps[cur];
+    var missing = false;
+    s.fields.forEach(function (f) {
+      if (f.t === "multi") {
+        var vals = [];
+        stepBox.querySelectorAll("[data-k='" + f.k + "'] input:checked").forEach(function (i) { vals.push(i.value); });
+        answers[f.k] = vals;
+        if (f.req && !vals.length) missing = true;
+      } else if (f.t === "radio") {
+        var r = stepBox.querySelector("[data-k='" + f.k + "'] input:checked");
+        answers[f.k] = r ? r.value : "";
+        if (f.req && !answers[f.k]) missing = true;
+      } else {
+        var el = document.getElementById("f-" + f.k);
+        answers[f.k] = (el.value || "").trim();
+        if (f.req && !answers[f.k]) missing = true;
+      }
+    });
+    return !missing;
+  }
+
+  btnNext.addEventListener("click", function () {
+    if (!collect()) { errMsg.style.display = "block"; return; }
+    if (cur < steps.length - 1) { cur++; renderStep(); }
+    else { buildReport(); }
+  });
+  btnPrev.addEventListener("click", function () { if (cur > 0) { collect(); cur--; renderStep(); } });
+
+  /* ============ génération du rapport ============ */
+  function scoreOpportunities() {
+    var res = [];
+    CATALOG.forEach(function (c) {
+      var impact = 0, matched = [];
+      (c.triggers.problemes || []).forEach(function (p) { if ((answers.problemes || []).indexOf(p) >= 0) { impact += 2; matched.push(PROB_LABELS[p]); } });
+      (c.triggers.taches || []).forEach(function (t) { if ((answers.taches || []).indexOf(t) >= 0) { impact += 2; } });
+      (c.triggers.objectifs || []).forEach(function (o) { if ((answers.objectifs || []).indexOf(o) >= 0) { impact += 1; } });
+      (c.triggers.contraintes || []).forEach(function (o) { if ((answers.contraintes || []).indexOf(o) >= 0) { impact += 2; } });
+      (c.triggers.budget || []).forEach(function (b) { if (answers.budget === b) { impact += 3; } });
+      if (impact === 0) return;
+      var fais = 2;
+      if (answers.budget === "b1" || (answers.contraintes || []).indexOf("budget-limite") >= 0) fais -= (c.famille === "Agent IA" ? 1 : 0);
+      if ((answers.contraintes || []).indexOf("competences") >= 0 && c.famille !== "Formation IA" && c.famille !== "Conseil stratégique") fais -= 0.5;
+      if (answers.maturite === "papier" && (c.famille === "Agent IA")) fais -= 0.5;
+      if (answers.maturite === "automatise") fais += 0.5;
+      res.push({ c: c, impact: impact, fais: fais, score: impact + fais, why: matched });
+    });
+    res.sort(function (a, b) { return b.score - a.score; });
+    return res;
+  }
+
+  function classifyProblems() {
+    var objMap = { "service-deborde": "client", "gestion-clients": "client", "suivi-commercial": "ventes", "marketing-irregulier": "ventes", "manque-temps": "temps", "taches-manuelles": "temps", "desorganisation": "orga", "donnees-eparpillees": "orga" };
+    var crit = [], imp = [], opt = [];
+    (answers.problemes || []).forEach(function (p) {
+      var linked = (answers.objectifs || []).indexOf(objMap[p]) >= 0;
+      if (linked) crit.push(PROB_LABELS[p]);
+      else imp.push(PROB_LABELS[p]);
+    });
+    Object.keys(PROB_LABELS).forEach(function (p) {
+      if ((answers.problemes || []).indexOf(p) < 0 && (answers.taches || []).some(function (t) { return (objMap[p] === "temps" && (t === "saisie" || t === "devis")); })) {
+        opt.push(PROB_LABELS[p]);
+      }
+    });
+    return { crit: crit, imp: imp, opt: opt };
+  }
+
+  function buildReport() {
+    var opps = scoreOpportunities();
+    var probs = classifyProblems();
+    var mat = MATURITY[answers.maturite] || MATURITY.basique;
+    var top = opps.slice(0, 3);
+    var today = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+
+    var objList = (answers.objectifs || []).map(function (o) { return OBJ_LABELS[o].toLowerCase(); }).join(", ");
+
+    var h = "<div class='r-head'>"
+      + "<div class='r-brand'>Bay Fall IA &bull; Rapport de diagnostic</div>"
+      + "<h2>" + esc(answers.entreprise) + "</h2>"
+      + "<p>" + esc(answers.secteur) + " &bull; " + esc(answers.taille) + " &bull; " + today + "</p>"
+      + "</div><div class='r-body'>";
+
+    // 1. Résumé exécutif
+    h += "<div class='r-sec'><h3><span class='n'>01</span>Résumé exécutif</h3>"
+      + "<p><b>" + esc(answers.entreprise) + "</b> vise en priorité : " + esc(objList) + ".</p>"
+      + (probs.crit.length ? "<p>Le diagnostic met en évidence <b>" + probs.crit.length + " point(s) critique(s)</b> qui freinent directement ces objectifs.</p>" : "")
+      + (top.length ? "<p>Recommandation prioritaire : <b>" + top[0].c.titre + "</b>" + (top[1] ? ", suivie de <b>" + top[1].c.titre + "</b>" : "") + ".</p>" : "")
+      + "</div>";
+
+    // 2. Présentation
+    h += "<div class='r-sec'><h3><span class='n'>02</span>Présentation de l'entreprise</h3>"
+      + "<p>" + esc(answers.description) + "</p>"
+      + (answers.produits ? "<p><b>Produits / services :</b> " + esc(answers.produits) + "</p>" : "")
+      + "</div>";
+
+    // 3. Diagnostic actuel + maturité
+    h += "<div class='r-sec'><h3><span class='n'>03</span>Diagnostic : votre niveau de maturité IA</h3>"
+      + "<div class='maturity'>";
+    ["Découverte", "Discuter", "Connecter", "Déléguer"].forEach(function (n, i) {
+      h += "<div class='mat-step" + (i === mat.pas ? " here" : "") + "'>" + n + "</div>";
+    });
+    h += "</div><p>" + mat.txt + "</p><p class='why'>Règle Bay Fall IA : on ne saute pas un niveau, on ne reste pas bloqué sous un plafond.</p></div>";
+
+    // 4. Problèmes classés
+    h += "<div class='r-sec'><h3><span class='n'>04</span>Problèmes identifiés</h3>";
+    if (probs.crit.length) { h += "<p><span class='tag crit'>Critique</span></p><ul>"; probs.crit.forEach(function (p) { h += "<li>" + p + "</li>"; }); h += "</ul>"; }
+    if (probs.imp.length) { h += "<p><span class='tag warn'>Important</span></p><ul>"; probs.imp.forEach(function (p) { h += "<li>" + p + "</li>"; }); h += "</ul>"; }
+    if (!probs.crit.length && !probs.imp.length) h += "<p>Aucun problème majeur déclaré. Le diagnostic portera sur l'optimisation.</p>";
+    h += "</div>";
+
+    // 5-6. Opportunités et solutions
+    h += "<div class='r-sec'><h3><span class='n'>05</span>Opportunités IA recommandées</h3>";
+    if (!top.length) {
+      h += "<p>Vos réponses ne permettent pas encore de cibler une opportunité précise. Le bon point de départ est un échange avec un conseiller Bay Fall IA.</p>";
+    }
+    top.forEach(function (o, i) {
+      var prio = i === 0 ? "<span class='tag gold'>Priorité 1</span>" : (i === 1 ? "<span class='tag gold'>Priorité 2</span>" : "<span class='tag ok'>Priorité 3</span>");
+      h += "<div class='opp'><h4>" + o.c.titre + " " + prio + "</h4>"
+        + "<p>" + o.c.desc + "</p>"
+        + "<p><b>Bénéfice attendu :</b> " + o.c.benefice + "</p>"
+        + "<p class='why'>Famille : " + o.c.famille + (o.why.length ? " — recommandé car vous avez signalé : " + o.why.join(" ; ").toLowerCase() : "") + "</p>"
+        + "</div>";
+    });
+    h += "</div>";
+
+    // 7. Plan d'action
+    h += "<div class='r-sec'><h3><span class='n'>06</span>Plan d'action proposé</h3>";
+    h += "<div class='plan-block'><b>Court terme (1er mois)</b>"
+      + (top[0] ? "Cadrer et lancer « " + top[0].c.titre + " » : périmètre précis, critères de succès, mise en place." : "Séance de cadrage avec Bay Fall IA pour préciser le besoin.")
+      + "</div>";
+    h += "<div class='plan-block'><b>Moyen terme (2-4 mois)</b>"
+      + (top[1] ? "Déployer « " + top[1].c.titre + " »" + (top[2] ? " puis « " + top[2].c.titre + " »" : "") + ", en mesurant les résultats à chaque étape." : "Étendre la première solution et mesurer les gains.")
+      + "</div>";
+    h += "<div class='plan-block'><b>Long terme (6-12 mois)</b>"
+      + "Former l'équipe, mesurer les gains (temps libéré, coût par cas traité) et élargir progressivement le périmètre confié à l'IA."
+      + "</div>";
+    h += "<p class='why'>Budget indiqué : " + (BUDGET_LABELS[answers.budget] || "à définir") + ".</p></div>";
+
+    // 8. Prochaines étapes
+    h += "<div class='r-sec'><h3><span class='n'>07</span>Prochaines étapes</h3>"
+      + "<ul><li>Valider ce diagnostic avec un conseiller Bay Fall IA (gratuit, 20 minutes) ;</li>"
+      + "<li>préciser le périmètre de la première solution ;</li>"
+      + "<li>lancer l'implémentation et mesurer les résultats.</li></ul>"
+      + (answers.succes ? "<p><b>Votre critère de réussite :</b> « " + esc(answers.succes) + " » — il servira de boussole au projet.</p>" : "")
+      + "</div>";
+
+    // CTA
+    h += "<div class='r-cta no-print'><p>Ce rapport vous parle ? Discutons-en ensemble, gratuitement.</p><div class='r-actions'>";
+    if (WHATSAPP_BAYFALL) {
+      var msg = "Bonjour Bay Fall IA, je viens de faire le diagnostic pour " + answers.entreprise + ". J'aimerais en discuter.";
+      h += "<a class='btn btn-wa' href='https://wa.me/" + WHATSAPP_BAYFALL + "?text=" + encodeURIComponent(msg) + "'>Discuter sur WhatsApp</a>";
+    }
+    h += "<button type='button' class='btn btn-navy' onclick='window.print()'>Télécharger en PDF</button>"
+      + "<button type='button' class='btn btn-ghost' onclick='location.reload()'>Refaire un diagnostic</button>"
+      + "</div></div>";
+
+    h += "</div>";
+
+    var rep = document.getElementById("report");
+    rep.innerHTML = h;
+    rep.classList.remove("hidden");
+    document.getElementById("diagnostic").classList.add("hidden");
+    progBar.style.width = "100%";
+    rep.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  renderStep();
+})();
+</script>
+
+</body>
+</html>
