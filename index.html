@@ -288,7 +288,8 @@
         { k: "secteur", t: "select", label: "Secteur d'activité", req: true, opts: SECTORS, other: "Autre" },
         { k: "taille", t: "select", label: "Taille de l'entreprise", req: true, opts: SIZES },
         { k: "taille_exacte", t: "tel", label: "Nombre exact d'employés <span class='opt-note'>(si vous le connaissez, facultatif)</span>", ph: "Ex : 12" },
-        { k: "responsable", t: "text", label: "Votre nom <span class='opt-note'>(responsable)</span>", ph: "Prénom et nom" },
+        { k: "role", t: "select", label: "Votre rôle dans l'entreprise", req: true, opts: ["Dirigeant(e) / Propriétaire", "Responsable / Manager", "Employé(e)"] },
+        { k: "responsable", t: "text", label: "Votre nom", ph: "Prénom et nom" },
         { k: "contact", t: "tel", label: "Votre numéro WhatsApp <span class='opt-note'>(pour recevoir le suivi, facultatif)</span>", ph: "+221 ..." }
       ]
     },
@@ -297,6 +298,21 @@
       fields: [
         { k: "description", t: "textarea", label: "Décrivez votre activité principale", req: true, ph: "Ex : Nous vendons du matériel de bureau aux entreprises de Dakar, avec livraison." },
         { k: "produits", t: "textarea", label: "Vos principaux produits ou services", ph: "Ex : fournitures, mobilier, imprimantes, contrats d'entretien..." }
+      ]
+    },
+    {
+      id: "type", title: "Votre type d'activité",
+      help: "Votre secteur est particulier : dites-nous ce qui décrit le mieux votre quotidien, pour que la suite du questionnaire vous ressemble.",
+      skip: function () { return !!sectorToArch(answers.secteur); },
+      fields: [
+        { k: "arch_choice", t: "radio", req: true, opts: [
+          ["vente", "Je vends des produits"],
+          ["services", "Je fournis des services (conseil, dossiers, rendez-vous, soins)"],
+          ["resto", "Je nourris ou héberge des clients (restauration, hôtellerie)"],
+          ["production", "Je produis, fabrique, cultive ou élève"],
+          ["education", "J'enseigne ou je forme"],
+          ["transport", "Je transporte ou je livre"]
+        ]}
       ]
     },
     {
@@ -315,31 +331,15 @@
     {
       id: "problemes", title: "Vos difficultés actuelles", help: "Cochez tout ce qui vous concerne. Soyez honnête : c'est la base du diagnostic.",
       fields: [
-        { k: "problemes", t: "multi", req: true, opts: [
-          ["manque-temps", "Manque de temps, journées surchargées"],
-          ["taches-manuelles", "Trop de tâches manuelles et répétitives"],
-          ["gestion-clients", "Difficulté à suivre et gérer les clients"],
-          ["service-deborde", "Service client débordé (messages sans réponse)"],
-          ["suivi-commercial", "Suivi commercial difficile (prospects perdus)"],
-          ["desorganisation", "Manque d'organisation interne"],
-          ["donnees-eparpillees", "Informations éparpillées (cahiers, WhatsApp, Excel...)"],
-          ["marketing-irregulier", "Communication / réseaux sociaux irréguliers"]
-        ]}
+        { k: "problemes", t: "multi", req: true, dyn: "problems", opts: [] },
+        { k: "probleme_autre", t: "text", label: "Une autre difficulté non listée ? <span class='opt-note'>(facultatif)</span>", ph: "Écrivez-la ici..." }
       ]
     },
     {
       id: "taches", title: "Vos tâches chronophages", help: "Quelles tâches prennent le plus de temps chez vous ? (plusieurs choix possibles)",
       fields: [
-        { k: "taches", t: "multi", req: true, opts: [
-          ["messages", "Répondre aux messages et appels des clients"],
-          ["devis", "Préparer des devis et des factures"],
-          ["saisie", "Saisir et recopier des données"],
-          ["rapports", "Préparer des rapports ou des comptes rendus"],
-          ["prospection", "Chercher et relancer des prospects"],
-          ["reseaux", "Publier sur les réseaux sociaux"],
-          ["rdv", "Planifier les rendez-vous"],
-          ["stocks", "Gérer les stocks et les commandes"]
-        ]}
+        { k: "taches", t: "multi", req: true, dyn: "tasks", opts: [] },
+        { k: "tache_autre", t: "text", label: "Une autre tâche qui vous prend du temps ? <span class='opt-note'>(facultatif)</span>", ph: "Écrivez-la ici..." }
       ]
     },
     {
@@ -450,12 +450,190 @@
     }
   ];
 
-  var PROB_LABELS = {};
-  steps[3].fields[0].opts.forEach(function (o) { PROB_LABELS[o[0]] = o[1]; });
+  function stepById(id) { for (var i = 0; i < steps.length; i++) { if (steps[i].id === id) return steps[i]; } }
   var OBJ_LABELS = {};
-  steps[2].fields[0].opts.forEach(function (o) { OBJ_LABELS[o[0]] = o[1]; });
+  stepById("objectifs").fields[0].opts.forEach(function (o) { OBJ_LABELS[o[0]] = o[1]; });
   var BUDGET_LABELS = {};
-  steps[6].fields[0].opts.forEach(function (o) { BUDGET_LABELS[o[0]] = o[1]; });
+  stepById("budget").fields[0].opts.forEach(function (o) { BUDGET_LABELS[o[0]] = o[1]; });
+
+  /* ---- questions adaptées au type d'activité ----
+     Mêmes identifiants partout (le moteur de diagnostic ne change pas),
+     seuls les libellés changent pour parler le langage du métier du client. */
+  var PROB_IDS = ["manque-temps", "taches-manuelles", "gestion-clients", "service-deborde", "suivi-commercial", "desorganisation", "donnees-eparpillees", "marketing-irregulier"];
+  var TASK_IDS = ["messages", "devis", "saisie", "rapports", "prospection", "reseaux", "rdv", "stocks"];
+
+  var BASE = {
+    problems: {
+      "manque-temps": "Manque de temps, journées surchargées",
+      "taches-manuelles": "Trop de tâches manuelles et répétitives",
+      "gestion-clients": "Difficulté à suivre et gérer les clients",
+      "service-deborde": "Trop de messages et d'appels, réponses en retard",
+      "suivi-commercial": "Suivi commercial difficile (prospects perdus)",
+      "desorganisation": "Manque d'organisation interne",
+      "donnees-eparpillees": "Informations éparpillées (cahiers, WhatsApp, Excel...)",
+      "marketing-irregulier": "Communication / réseaux sociaux irréguliers"
+    },
+    tasks: {
+      "messages": "Répondre aux messages et appels des clients",
+      "devis": "Préparer des devis et des factures",
+      "saisie": "Saisir et recopier des données",
+      "rapports": "Préparer des rapports ou des comptes rendus",
+      "prospection": "Chercher et relancer des prospects",
+      "reseaux": "Publier sur les réseaux sociaux",
+      "rdv": "Planifier les rendez-vous",
+      "stocks": "Gérer les stocks et les commandes"
+    }
+  };
+
+  var ARCH_DATA = {
+    vente: { label: "Vente de produits",
+      problems: {
+        "gestion-clients": "Difficile de suivre les clients et leurs commandes",
+        "service-deborde": "Questions clients en masse (prix, disponibilité) sans réponse rapide",
+        "suivi-commercial": "Relances mal suivies, clients qui partent à la concurrence",
+        "donnees-eparpillees": "Ventes et stocks notés un peu partout (cahiers, WhatsApp, Excel)"
+      },
+      tasks: {
+        "messages": "Répondre aux questions des clients (prix, disponibilité)",
+        "devis": "Préparer factures, reçus et bons de commande",
+        "saisie": "Recopier les ventes et les entrées de stock",
+        "rapports": "Faire le point sur les ventes et la caisse",
+        "prospection": "Relancer les clients et en chercher de nouveaux",
+        "reseaux": "Publier les produits sur les réseaux sociaux",
+        "rdv": "Organiser les livraisons",
+        "stocks": "Gérer les stocks et les commandes fournisseurs"
+      }
+    },
+    services: { label: "Prestation de services",
+      problems: {
+        "gestion-clients": "Difficile de suivre le dossier de chaque client",
+        "service-deborde": "Sollicitations permanentes (appels, messages, emails)",
+        "suivi-commercial": "Prospects mal suivis, opportunités manquées",
+        "donnees-eparpillees": "Dossiers clients éparpillés (emails, WhatsApp, papiers)"
+      },
+      tasks: {
+        "messages": "Répondre aux demandes des clients",
+        "devis": "Rédiger devis, propositions et factures",
+        "saisie": "Mettre à jour les dossiers clients",
+        "rapports": "Rédiger comptes rendus et rapports",
+        "prospection": "Prospecter et relancer les clients potentiels",
+        "reseaux": "Communiquer sur les réseaux sociaux",
+        "rdv": "Planifier les rendez-vous et réunions",
+        "stocks": "Classer contrats et documents"
+      }
+    },
+    resto: { label: "Restauration / Hôtellerie",
+      problems: {
+        "gestion-clients": "Pas de suivi des clients fidèles",
+        "service-deborde": "Commandes et réservations difficiles à suivre aux heures de pointe",
+        "suivi-commercial": "Peu de moyens de faire revenir les clients",
+        "donnees-eparpillees": "Commandes et comptes sur papier, sans vue d'ensemble",
+        "marketing-irregulier": "Peu de visibilité en ligne (réseaux, avis clients)"
+      },
+      tasks: {
+        "messages": "Répondre aux clients (commandes, horaires) sur WhatsApp et au téléphone",
+        "devis": "Établir additions, factures et devis traiteur",
+        "saisie": "Tenir la caisse et les comptes du jour",
+        "rapports": "Faire le bilan des ventes de la semaine",
+        "prospection": "Fidéliser et faire revenir les clients",
+        "reseaux": "Publier le menu et les promotions en ligne",
+        "rdv": "Gérer les réservations",
+        "stocks": "Suivre les stocks de cuisine et les achats"
+      }
+    },
+    production: { label: "Production / Fabrication / Agriculture",
+      problems: {
+        "gestion-clients": "Difficile de suivre commandes et clients (revendeurs, grossistes)",
+        "service-deborde": "Demandes clients qui interrompent la production",
+        "suivi-commercial": "Peu de temps pour chercher de nouveaux débouchés",
+        "donnees-eparpillees": "Production, pertes et ventes notées un peu partout"
+      },
+      tasks: {
+        "messages": "Répondre aux clients et aux revendeurs",
+        "devis": "Chiffrer les commandes et facturer",
+        "saisie": "Noter la production, les pertes et les ventes",
+        "rapports": "Suivre les coûts et les marges",
+        "prospection": "Trouver de nouveaux débouchés et clients",
+        "reseaux": "Montrer les produits en ligne",
+        "rdv": "Planifier la production et les livraisons",
+        "stocks": "Suivre matières premières et produits finis"
+      }
+    },
+    education: { label: "Éducation / Formation",
+      problems: {
+        "gestion-clients": "Difficile de suivre chaque élève / apprenant",
+        "service-deborde": "Questions des parents et apprenants en permanence",
+        "suivi-commercial": "Difficile de recruter de nouveaux inscrits",
+        "donnees-eparpillees": "Notes, présences et paiements éparpillés"
+      },
+      tasks: {
+        "messages": "Répondre aux parents et aux apprenants",
+        "devis": "Établir factures et reçus de scolarité",
+        "saisie": "Suivre présences, notes et paiements",
+        "rapports": "Préparer bulletins et rapports",
+        "prospection": "Recruter de nouveaux inscrits",
+        "reseaux": "Communiquer sur les réseaux sociaux",
+        "rdv": "Gérer inscriptions et emplois du temps",
+        "stocks": "Gérer supports de cours et matériel"
+      }
+    },
+    transport: { label: "Transport / Livraison",
+      problems: {
+        "gestion-clients": "Difficile de suivre les clients et les contrats",
+        "service-deborde": "Demandes de course / livraison en continu",
+        "suivi-commercial": "Peu de temps pour chercher de nouveaux contrats",
+        "donnees-eparpillees": "Courses, paiements et dépenses notés un peu partout"
+      },
+      tasks: {
+        "messages": "Répondre aux demandes de course ou de livraison",
+        "devis": "Établir devis et factures",
+        "saisie": "Noter les courses et les paiements",
+        "rapports": "Faire le point recettes / dépenses",
+        "prospection": "Trouver de nouveaux contrats",
+        "reseaux": "Être visible en ligne",
+        "rdv": "Planifier les tournées et les courses",
+        "stocks": "Suivre véhicules, carburant et entretien"
+      }
+    }
+  };
+
+  var SECTOR_ARCH = {
+    "Commerce / Boutique": "vente", "Services aux entreprises": "services",
+    "Restauration / Hôtellerie": "resto", "Immobilier": "services",
+    "Éducation / Formation": "education", "Santé": "services",
+    "Transport / Logistique": "transport", "Artisanat / Production": "production",
+    "Finance / Microfinance": "services", "Agriculture / Agroalimentaire": "production",
+    "Technologie / Digital": "services"
+  };
+  var ARCH_KEYWORDS = [
+    ["vente", ["vente", "boutique", "magasin", "commerc", "négoce", "negoce", "distribution", "quincail", "friperie", "cosmeti", "cosméti", "librairie", "pharmaci", "e-commerce", "revend"]],
+    ["resto", ["restaur", "resto", "fast", "café", "cafe", "hôtel", "hotel", "traiteur", "cuisine", "grill", "dibiterie", "auberge"]],
+    ["production", ["atelier", "usine", "fabri", "production", "produc", "couture", "tailleur", "menuis", "élevage", "elevage", "agric", "ferme", "pêche", "peche", "maraîch", "maraich", "boulanger", "pâtisser", "patisser", "agro", "aviculture", "volaille"]],
+    ["education", ["école", "ecole", "formation", "cours", "université", "universite", "institut", "enseign", "coran", "crèche", "creche", "professeur"]],
+    ["transport", ["transport", "logisti", "livraison", "livreur", "taxi", "location de voiture", "chauffeur", "colis", "déménage", "demenage"]],
+    ["services", ["agence", "conseil", "cabinet", "clinique", "salon", "coiffure", "beauté", "beaute", "nettoyage", "sécurité", "securite", "événement", "evenement", "communication", "avocat", "notaire", "comptab", "immobil", "assurance", "informatique", "digital", "marketing", "santé", "sante"]]
+  ];
+
+  function sectorToArch(s) {
+    if (!s) return null;
+    if (SECTOR_ARCH[s]) return SECTOR_ARCH[s];
+    var t = s.toLowerCase();
+    for (var i = 0; i < ARCH_KEYWORDS.length; i++) {
+      for (var j = 0; j < ARCH_KEYWORDS[i][1].length; j++) {
+        if (t.indexOf(ARCH_KEYWORDS[i][1][j]) >= 0) return ARCH_KEYWORDS[i][0];
+      }
+    }
+    return null;
+  }
+  function getArch() { return sectorToArch(answers.secteur) || answers.arch_choice || "services"; }
+  function libelle(kind, id) {
+    var a = ARCH_DATA[getArch()];
+    return (a && a[kind] && a[kind][id]) || BASE[kind][id] || id;
+  }
+  function dynOpts(kind) {
+    var ids = kind === "problems" ? PROB_IDS : TASK_IDS;
+    return ids.map(function (id) { return [id, libelle(kind, id)]; });
+  }
 
   var MATURITY = {
     papier:     { niveau: "Découverte", pas: 0, txt: "Vous travaillez surtout à la main. C'est le bon moment pour poser des bases simples : la marge de progression est énorme." },
@@ -479,8 +657,11 @@
 
   function renderStep() {
     var s = steps[cur];
-    progBar.style.width = Math.round((cur) / steps.length * 100) + "%";
-    stepLabel.textContent = "Étape " + (cur + 1) + " sur " + steps.length;
+    s.fields.forEach(function (f) { if (f.dyn) f.opts = dynOpts(f.dyn); });
+    var vis = steps.filter(function (st) { return !(st.skip && st.skip()); });
+    var pos = vis.indexOf(s); if (pos < 0) pos = 0;
+    progBar.style.width = Math.round(pos / vis.length * 100) + "%";
+    stepLabel.textContent = "Étape " + (pos + 1) + " sur " + vis.length;
     errMsg.style.display = "none";
     var h = "<h3 class='q-title'>" + s.title + "</h3><p class='q-help'>" + s.help + "</p>";
     s.fields.forEach(function (f) {
@@ -562,17 +743,25 @@
 
   btnNext.addEventListener("click", function () {
     if (!collect()) { errMsg.style.display = "block"; return; }
-    if (cur < steps.length - 1) { cur++; renderStep(); }
+    var n = cur + 1;
+    while (n < steps.length && steps[n].skip && steps[n].skip()) n++;
+    if (n < steps.length) { cur = n; renderStep(); }
     else { buildReport(); }
   });
-  btnPrev.addEventListener("click", function () { if (cur > 0) { collect(); cur--; renderStep(); } });
+  btnPrev.addEventListener("click", function () {
+    if (cur === 0) return;
+    collect();
+    var p = cur - 1;
+    while (p > 0 && steps[p].skip && steps[p].skip()) p--;
+    cur = p; renderStep();
+  });
 
   /* ============ génération du rapport ============ */
   function scoreOpportunities() {
     var res = [];
     CATALOG.forEach(function (c) {
       var impact = 0, matched = [];
-      (c.triggers.problemes || []).forEach(function (p) { if ((answers.problemes || []).indexOf(p) >= 0) { impact += 2; matched.push(PROB_LABELS[p]); } });
+      (c.triggers.problemes || []).forEach(function (p) { if ((answers.problemes || []).indexOf(p) >= 0) { impact += 2; matched.push(libelle("problems", p)); } });
       (c.triggers.taches || []).forEach(function (t) { if ((answers.taches || []).indexOf(t) >= 0) { impact += 2; } });
       (c.triggers.objectifs || []).forEach(function (o) { if ((answers.objectifs || []).indexOf(o) >= 0) { impact += 1; } });
       (c.triggers.contraintes || []).forEach(function (o) { if ((answers.contraintes || []).indexOf(o) >= 0) { impact += 2; } });
@@ -594,14 +783,10 @@
     var crit = [], imp = [], opt = [];
     (answers.problemes || []).forEach(function (p) {
       var linked = (answers.objectifs || []).indexOf(objMap[p]) >= 0;
-      if (linked) crit.push(PROB_LABELS[p]);
-      else imp.push(PROB_LABELS[p]);
+      if (linked) crit.push(libelle("problems", p));
+      else imp.push(libelle("problems", p));
     });
-    Object.keys(PROB_LABELS).forEach(function (p) {
-      if ((answers.problemes || []).indexOf(p) < 0 && (answers.taches || []).some(function (t) { return (objMap[p] === "temps" && (t === "saisie" || t === "devis")); })) {
-        opt.push(PROB_LABELS[p]);
-      }
-    });
+    if (answers.probleme_autre) imp.push(answers.probleme_autre + " (signalé par le répondant)");
     return { crit: crit, imp: imp, opt: opt };
   }
 
@@ -616,9 +801,11 @@
       taille: (answers.taille_exacte ? answers.taille_exacte + " employés" : answers.taille),
       responsable: answers.responsable || "", contact: answers.contact || "",
       description: answers.description || "", produits: answers.produits || "",
+      role: answers.role || "",
+      type_activite: (ARCH_DATA[getArch()] || {}).label || "",
       objectifs: (answers.objectifs || []).map(function (o) { return OBJ_LABELS[o]; }).join(" | "),
-      problemes: (answers.problemes || []).map(function (p) { return PROB_LABELS[p]; }).join(" | "),
-      taches: (answers.taches || []).join(" | "),
+      problemes: (answers.problemes || []).map(function (p) { return libelle("problems", p); }).join(" | ") + (answers.probleme_autre ? " | Autre : " + answers.probleme_autre : ""),
+      taches: (answers.taches || []).map(function (t) { return libelle("tasks", t); }).join(" | ") + (answers.tache_autre ? " | Autre : " + answers.tache_autre : ""),
       maturite: (MATURITY[answers.maturite] || {}).niveau || "",
       budget: BUDGET_LABELS[answers.budget] || "",
       contraintes: (answers.contraintes || []).join(" | "),
@@ -645,7 +832,8 @@
     var h = "<div class='r-head'>"
       + "<div class='r-brand'>Bay Fall IA &bull; Rapport de diagnostic</div>"
       + "<h2>" + esc(answers.entreprise) + "</h2>"
-      + "<p>" + esc(answers.secteur) + " &bull; " + esc(tailleTxt) + " &bull; " + today + "</p>"
+      + "<p>" + esc(answers.secteur) + " &bull; " + esc(tailleTxt) + " &bull; " + today
+      + (answers.role ? "<br>Rempli par : " + esc(answers.responsable ? answers.responsable + " — " + answers.role : answers.role) : "") + "</p>"
       + "</div><div class='r-body'>";
 
     // 1. Résumé exécutif
