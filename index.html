@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bay Fall IA — Diagnostic IA gratuit pour votre entreprise</title>
-<meta name="description" content="Découvrez en 10 minutes où l'intelligence artificielle peut faire gagner du temps et de l'argent à votre entreprise. Diagnostic gratuit, pensé pour l'Afrique francophone.">
+<title>Bay Fall IA — Le diagnostic IA de votre entreprise</title>
+<meta name="description" content="Découvrez en 10 minutes où l'intelligence artificielle peut faire gagner du temps et de l'argent à votre entreprise. Aperçu gratuit, rapport complet à 5 000 FCFA (Wave / Orange Money).">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_SN">
 <meta property="og:site_name" content="Bay Fall IA">
-<meta property="og:title" content="Bay Fall IA — Diagnostic IA gratuit pour votre entreprise">
-<meta property="og:description" content="Répondez à quelques questions, recevez votre rapport de diagnostic IA personnalisé. Gratuit, simple, pensé pour les PME africaines.">
+<meta property="og:title" content="Bay Fall IA — Le diagnostic IA de votre entreprise">
+<meta property="og:description" content="Répondez à quelques questions, découvrez où l'IA peut faire gagner du temps et de l'argent à votre entreprise. Aperçu gratuit, rapport complet à 5 000 FCFA.">
 <meta property="og:url" content="https://fayeablaye759-ux.github.io/bayfall-ia/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%230D1B2E'/%3E%3Ctext x='50' y='64' font-size='38' font-weight='bold' text-anchor='middle' fill='%23D4AF37' font-family='Georgia'%3EBF%3C/text%3E%3C/svg%3E">
 <style>
@@ -213,20 +213,20 @@
         <span class="brand-sub">Diagnostic &amp; transformation IA</span>
       </span>
     </div>
-    <a class="btn btn-gold btn-sm no-print" href="#diagnostic" style="padding:10px 16px; font-size:.88rem;">Diagnostic gratuit</a>
+    <a class="btn btn-gold btn-sm no-print" href="#diagnostic" style="padding:10px 16px; font-size:.88rem;">Faire mon diagnostic</a>
   </div>
 </header>
 
 <section class="hero" id="accueil">
   <div class="wrap">
-    <span class="eyebrow">Gratuit &bull; 10 minutes &bull; Afrique francophone</span>
+    <span class="eyebrow">10 minutes &bull; Aperçu gratuit &bull; Afrique francophone</span>
     <h1>Découvrez où l'IA peut faire <span class="accent">gagner du temps et de l'argent</span> à votre entreprise.</h1>
-    <p class="lead">Répondez à quelques questions simples sur votre activité. Bay Fall IA analyse vos réponses avec sa méthode de diagnostic et vous remet un rapport personnalisé : vos problèmes classés par priorité, les opportunités IA adaptées à votre réalité, et un plan d'action concret.</p>
-    <a class="btn btn-gold" href="#diagnostic">Commencer mon diagnostic gratuit</a>
+    <p class="lead">Répondez à quelques questions simples sur votre activité. Bay Fall IA analyse vos réponses avec sa méthode de diagnostic : l'aperçu de vos résultats est gratuit, et le rapport complet (problèmes classés, recommandations expliquées, plan d'action sur 12 mois) est à 5 000 FCFA, payable par Wave ou Orange Money.</p>
+    <a class="btn btn-gold" href="#diagnostic">Commencer mon diagnostic</a>
     <div class="trust">
-      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Sans engagement</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Budgets en FCFA</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Rapport immédiat</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Questionnaire gratuit</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Rapport complet : 5 000 FCFA</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Wave &amp; Orange Money</span>
     </div>
   </div>
 </section>
@@ -271,6 +271,12 @@
   // Numéro WhatsApp de Bay Fall IA (format international sans +, ex: 221771234567).
   // Tant qu'il est vide, les boutons WhatsApp du rapport restent masqués.
   var WHATSAPP_BAYFALL = "221777556258";
+
+  // Offre payante : le questionnaire et l'aperçu sont gratuits, le rapport complet est payant.
+  var PRIX_RAPPORT = "5 000 FCFA";
+  var WAVE_NUMERO = "76 452 86 63";
+  var OM_NUMERO = "77 755 62 58";
+  var CODE_DEBLOCAGE = "TERANGA26"; // code à envoyer au client après vérification du paiement
 
   // Boîte aux lettres des copies de rapport : chaque diagnostic complété est envoyé
   // par email à Bay Fall IA via FormSubmit (service gratuit, sans serveur).
@@ -797,6 +803,7 @@
     var d = {
       _subject: "Nouveau diagnostic Bay Fall IA : " + answers.entreprise,
       _template: "table",
+      statut: "Aperçu affiché — client en attente de paiement (" + PRIX_RAPPORT + ")",
       entreprise: answers.entreprise, secteur: answers.secteur,
       taille: (answers.taille_exacte ? answers.taille_exacte + " employés" : answers.taille),
       responsable: answers.responsable || "", contact: answers.contact || "",
@@ -912,11 +919,67 @@
 
     h += "</div>";
 
+    /* ---- aperçu gratuit + déblocage payant ---- */
+    var waPaye = "https://wa.me/" + WHATSAPP_BAYFALL + "?text=" + encodeURIComponent(
+      "Bonjour Bay Fall IA, je viens de payer " + PRIX_RAPPORT + " pour le rapport complet de " + answers.entreprise + ". Voici ma preuve de paiement :");
+
+    var t = "<div class='r-head'>"
+      + "<div class='r-brand'>Bay Fall IA &bull; Aperçu de votre diagnostic</div>"
+      + "<h2>" + esc(answers.entreprise) + "</h2>"
+      + "<p>" + esc(answers.secteur) + " &bull; " + esc(tailleTxt) + " &bull; " + today + "</p>"
+      + "</div><div class='r-body'>";
+
+    t += "<div class='r-sec'><h3><span class='n'>01</span>Votre niveau de maturité IA</h3><div class='maturity'>";
+    ["Découverte", "Discuter", "Connecter", "Déléguer"].forEach(function (n, i) {
+      t += "<div class='mat-step" + (i === mat.pas ? " here" : "") + "'>" + n + "</div>";
+    });
+    t += "</div><p>" + mat.txt + "</p></div>";
+
+    t += "<div class='r-sec'><h3><span class='n'>02</span>Ce que le diagnostic a détecté</h3><ul>"
+      + "<li><b>" + probs.crit.length + " problème(s) critique(s)</b> qui freinent directement vos objectifs</li>"
+      + "<li><b>" + probs.imp.length + " problème(s) important(s)</b> à traiter</li>"
+      + "<li><b>" + top.length + " opportunité(s) IA</b> adaptées à votre activité, classées par priorité</li></ul>";
+    if (top[0]) {
+      t += "<div class='opp'><h4>" + top[0].c.titre + " <span class='tag gold'>Priorité 1</span></h4>"
+        + "<p class='why'>Le détail (bénéfices, raisons du choix, plan d'action) est dans votre rapport complet.</p></div>";
+    }
+    if (top[1]) t += "<div class='opp' style='opacity:.55'><h4>🔒 Recommandation n°2 — réservée au rapport complet</h4></div>";
+    if (top[2]) t += "<div class='opp' style='opacity:.4'><h4>🔒 Recommandation n°3 — réservée au rapport complet</h4></div>";
+    t += "</div>";
+
+    t += "<div class='r-cta'>"
+      + "<p style='font-size:1.08rem;'>Débloquez votre rapport complet — " + PRIX_RAPPORT + "</p>"
+      + "<p style='font-weight:400;margin-top:-6px;'>8 sections : vos problèmes analysés, vos 3 recommandations expliquées, votre plan d'action sur 12 mois. Téléchargeable en PDF.</p>"
+      + "<div style='text-align:left;max-width:440px;margin:0 auto 14px;font-size:.93rem;'>"
+      + "<p style='margin:7px 0;'><b>1.</b> Payez " + PRIX_RAPPORT + " au choix :<br>&nbsp;&nbsp;&nbsp;&nbsp;<b>Wave :</b> " + WAVE_NUMERO + "<br>&nbsp;&nbsp;&nbsp;&nbsp;<b>Orange Money :</b> " + OM_NUMERO + "</p>"
+      + "<p style='margin:7px 0;'><b>2.</b> Cliquez « J'ai payé » et envoyez votre preuve sur WhatsApp.</p>"
+      + "<p style='margin:7px 0;'><b>3.</b> Recevez votre <b>code de déblocage</b> en quelques minutes, puis saisissez-le ci-dessous. <b>Gardez cette page ouverte.</b></p>"
+      + "</div>"
+      + "<div class='r-actions'><a class='btn btn-wa' href='" + waPaye + "'>J'ai payé — envoyer ma preuve</a></div>"
+      + "<div style='margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;'>"
+      + "<input type='text' id='code-input' placeholder='Code de déblocage' style='max-width:210px;text-transform:uppercase;'>"
+      + "<button type='button' class='btn btn-navy' id='btn-unlock'>Débloquer</button>"
+      + "</div>"
+      + "<p class='err' id='code-err' style='margin-top:8px;'>Code incorrect. Vérifiez le message WhatsApp reçu de Bay Fall IA.</p>"
+      + "<button type='button' class='btn btn-ghost' onclick='location.reload()' style='margin-top:12px;'>Refaire un diagnostic</button>"
+      + "</div>";
+
+    t += "</div>";
+
     var rep = document.getElementById("report");
-    rep.innerHTML = h;
+    rep.innerHTML = t;
     rep.classList.remove("hidden");
     document.getElementById("diagnostic").classList.add("hidden");
     progBar.style.width = "100%";
+    document.getElementById("btn-unlock").addEventListener("click", function () {
+      var v = (document.getElementById("code-input").value || "").trim().toUpperCase();
+      if (v === CODE_DEBLOCAGE) {
+        rep.innerHTML = h;
+        rep.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        document.getElementById("code-err").style.display = "block";
+      }
+    });
     rep.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
